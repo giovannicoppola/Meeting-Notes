@@ -1,0 +1,71 @@
+### Monday, October 12, 2020, 10:57 AM
+### script to automate the creation of a markdown note in devonthink for an existing meeting in Outlook. 
+### procedure: focus on a calendar event, then run the script via alfred or hotkey
+## need to extract fromn the calendar event:
+# 1) meeting title
+# 2) meeting day, time 
+# 3) meeting participants	
+#important: need to get the FOlder ID from DEVONthink and replace the *** ENTER FOLDER ID HERE *** string on line 48
+
+tell application "Microsoft Outlook"
+	activate
+	
+	
+	
+	if view of the first main window is equal to calendar view then
+		set calendarEvent to selection -- grabbing the selected event
+		
+		
+		-- if there are no events selected, warn the user and then quit
+		if calendarEvent is missing value then
+			display dialog "Please select a calendar event first and then run this script! 😀" with icon 1
+			return
+		end if
+		
+		set eventTitle to subject of calendarEvent -- grabbing the event title
+		set eventStart to start time of calendarEvent
+		set startFormat to date string of eventStart
+		
+		
+		set noteTitle to eventTitle & ", " & startFormat
+		log noteTitle
+		#	set calendarAttendees to get attendees of calendarEvent
+		
+		set emailList to get every email address of every attendee of calendarEvent
+		
+		set nameList to "<sub>"
+		set ind to 0
+		repeat with theName in emailList
+			set ind to (ind + 1)
+			if ind = 1 then
+				set nameList to nameList & name of theName
+			else
+				set nameList to nameList & ", " & name of theName
+			end if
+		end repeat
+		
+		tell application id "DNtp"
+			set theID to "*** ENTER FOLDER ID HERE ***"
+			set theGroup to get record with uuid theID
+			set theRecord to create record with {name:noteTitle, type:markdown, content:"### " & eventTitle & "
+" & "#### " & eventStart & "
+" & nameList} in theGroup
+			set myNewWindow to open window for record theRecord
+			activate myNewWindow
+			
+			tell application "System Events"
+				
+				keystroke "x" using {command down, control down}
+				key code 125 using {command down}
+				key code 36
+				key code 36
+			end tell
+			
+		end tell
+		
+	else
+		display dialog "This is not calendar view! 😀" with icon 1
+		return
+	end if
+	
+end tell
