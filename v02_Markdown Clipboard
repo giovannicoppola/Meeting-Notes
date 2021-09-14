@@ -46,15 +46,9 @@ tell application "Microsoft Outlook"
 			
 			try
 				set calendarEvent to get occurrence of calendar event id myID at tdate
-				#log thisCalEvent
 				set eventStart to start time of calendarEvent
-				log {"starting event after conversion", eventStart}
-				#set thisCalEvent to get occurrence of calendar event id myID at sdate
+				
 			on error
-				#log sdate
-				#set myRec to recurrence of calendarEvent
-				#log myRec
-				#set thisCalEvent to get occurrence of calendar event id myID at sdate
 				
 				display dialog "❗This is a recurrent event, but I see no occurrences on " & tdate with icon 1
 				
